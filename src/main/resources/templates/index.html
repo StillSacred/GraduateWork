@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vehicles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+
+<div class="container text-center">
+    <div class="container text-center"><br>
+        <div class="row">
+            <span class="h4">Список ТС</span>
+        </div>
+        <div class="row">
+            <span class="h3" th:if="${totalPages == 0}"> Записей не найдено</span>
+        </div>
+    </div>
+    <br>
+    <table th:if="${page.getNumberOfElements()}" class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Марка</th>
+            <th scope="col">Модель</th>
+            <th scope="col">Категория</th>
+            <th scope="col">Тип</th>
+            <th scope="col">Год выпуска</th>
+            <th scope="col">Гос.номер</th>
+            <th scope="col">Прицеп</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${page}">
+            <td th:text="${item.getBrand()}"></td>
+            <td th:text="${item.getModel()}"></td>
+            <td th:text="${item.getCategory()}"></td>
+            <td th:text="${item.getType()}"></td>
+            <td th:text="${item.getProdYear()}"></td>
+            <td th:text="${item.getRegNumber()}"></td>
+            <td th:text="${item.isHasTrailer() ? 'да' : 'нет'}"></td>
+            <td>
+                <form th:method="GET" th:action="@{/vehicle/update/{regNumber}(regNumber=${item.getRegNumber()})}">
+                    <input type="submit" class="btn btn-warning" value="Редактировать">
+                </form>
+            </td>
+            <td>
+                <form th:method="DELETE" th:action="@{/vehicle/delete/{regNumber}(regNumber=${item.getRegNumber()})}">
+                    <input type="submit" class="btn btn-danger" value="Удалить">
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="container text-center">
+        <div class="row">
+            <div class="col">
+                <div th:if="${pageNumber} > 0">
+                    <a th:href="@{'/vehicle?offset=' + ${(pageNumber - 1)} + '&limit=' + ${limit}}">
+                        <button type="button"
+                                class="btn btn-primary">Предыдущая страница
+                        </button>
+                    </a>
+                </div>
+            </div>
+            <div class="col">
+                <span>Страница <span th:text="${totalPages} ? ${(pageNumber + 1)} : 0"></span> из <span
+                        th:text="${totalPages}"></span></span>
+            </div>
+            <div class="col">
+                <div th:if="${pageNumber} < (${totalPages} - 1)">
+                    <a th:href="@{'/vehicle?offset=' + ${(pageNumber + 1)} + '&limit=' + ${limit}}">
+                        <button type="button"
+                                class="btn btn-primary">Следующая страница
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="container text-center">
+        <div class="row">
+            <div class="col">
+                <form th:method="GET" th:action="@{/vehicle/new}">
+                    <input type="submit" class="btn btn-primary" value="Добавить запись">
+                </form>
+            </div>
+            <div class="col">
+                <form th:method="GET" th:action="@{/vehicle}">
+                    <input type="submit" class="btn btn-primary" value="Сбросить фильтрацию">
+                </form>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="container text-center">
+        <div class="mb-3">
+            <form th:method="GET" th:action="@{/vehicle/filter}" th:object="${request}">
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <span class="h4">Поиск</span>
+                    </div>
+                </div>
+                <br>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="brand" class="form label h5">Марка</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control" th:field="*{brand}" id="brand"/><br>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="model" class="form label h5">Модель</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control" th:field="*{model}" id="model"/><br>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="category" class="form label h5">Категория</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control" th:field="*{category}" id="category"/><br>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="regNumber" class="form label h5">Гос. номер</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" class="form-control" th:field="*{regNumber}" id="regNumber"/><br>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label for="prodYear" class="form label h5">Год выпуска</label>
+                    </div>
+                    <div class="col-auto">
+                        <select id="prodYear" class="form-select" th:field="*{prodYear}">
+                            <option th:value="${null}" th:text="Все"></option>
+                            <option th:each="year : ${#numbers.sequence(#dates.year(#dates.createNow()), 1900)}"
+                                    th:value="${year}" th:text="${year}">
+                            </option>
+                        </select><br>
+                    </div>
+                </div>
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <input type="submit" class="btn btn-primary" value="Искать">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
